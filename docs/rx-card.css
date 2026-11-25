@@ -25,3 +25,7 @@
 .rxCard footer { margin-top: 1rem; color: #4f6357; }
 #form.rxCard > section, #form.rxCard > details { background: transparent; padding: .7rem 0; border: 0; border-bottom: 1px solid #c8cec1; border-radius: 0; }
 .padHeader { flex-wrap: wrap; }
+
+.padHeader .cardIcon { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; }
+.padHeader .cardIcon:focus-visible { outline: 3px solid #34594a; outline-offset: 3px; }
+.padHeader span { margin-right: auto; }

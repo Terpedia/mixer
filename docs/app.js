@@ -232,6 +232,12 @@ function newRecipe() {
   $('titleInput').focus();
 }
 $('cancelFork').onclick = clearFork;
+function cardIcon(button, label, path) {
+  button.className = 'cardIcon';
+  button.title = label;
+  button.setAttribute('aria-label', label);
+  button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + path + '"/></svg>';
+}
 function recipeCard(rx, editable = true) {
   const card = document.createElement('article');
   card.className = 'rxCard';
@@ -299,7 +305,7 @@ function recipeCard(rx, editable = true) {
   if (editable) {
     const edit = document.createElement('button');
     edit.type = 'button';
-    edit.textContent = 'Edit Rx';
+    cardIcon(edit, 'Edit Rx', 'M4 20l4.5-1 12-12-3.5-3.5-12 12L4 20z M14.5 6l3.5 3.5');
     edit.onclick = () => startFork(rx, true);
     card.querySelector('.padHeader').append(edit);
   }
@@ -319,7 +325,7 @@ function render(){
   featured.querySelector('.padHeader span').textContent = recipes.length ? 'Latest saved Rx card' : 'Example Rx card';
   const create = document.createElement('button');
   create.type = 'button';
-  create.textContent = 'New Rx';
+  cardIcon(create, 'New Rx', 'M12 4v16 M4 12h16');
   create.onclick = newRecipe;
   featured.querySelector('.padHeader').append(create);
   $('featuredRx').replaceChildren(featured);
