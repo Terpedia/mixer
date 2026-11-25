@@ -11,7 +11,7 @@ with open(sys.argv[1], newline='') as source:
             continue
         name = row['compound_names']
         key = (name, row['matched_inchikey'])
-        groups.setdefault(key, set()).add((row['terokit_id'], row['vendor'], row['vendor_code']))
+        groups.setdefault(key, set()).add((row['terokit_id'], row['vendor'], row['vendor_code'], row['website']))
 records = [
     dict(name=name, inchikey=inchikey, listings=sorted(listings))
     for (name, inchikey), listings in sorted(groups.items())

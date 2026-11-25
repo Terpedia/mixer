@@ -39,7 +39,12 @@ function ingredientRow(item, amount) {
   const columns = document.createElement('span');
   const detail = document.createElement('small');
   detail.textContent = amount ?? item.type;
-  columns.append(item.name, detail);
+  const entity = document.createElement('a');
+  entity.textContent = item.name;
+  entity.href = './ingredient.html?id=' + encodeURIComponent(item.inchikey || item.id);
+  entity.target = '_blank';
+  entity.rel = 'noopener';
+  columns.append(entity, detail);
   summary.append(columns);
   const profile = document.createElement('p');
   const components = Object.entries(item.profile).map(([name, value]) => name + ' ' + value + '%');
@@ -239,8 +244,8 @@ function render(){
   const example = {
     name: '10% myrcene', batchGrams: 10,
     ingredients: [
-      {name:'Myrcene isolate', type:'Example isolate', profile:{Myrcene:95}, grams:1/0.95},
-      {name:'Neutral carrier', type:'Carrier', profile:{}, grams:10-1/0.95}
+      {inchikey:'UAHWPYUMFXYFJY-UHFFFAOYSA-N', name:'Myrcene isolate', type:'Example isolate', profile:{Myrcene:95}, grams:1/0.95},
+      {id:'neutral', name:'Neutral carrier', type:'Carrier', profile:{}, grams:10-1/0.95}
     ],
     profile:[{name:'Myrcene', target:10, estimated:10}]
   };
