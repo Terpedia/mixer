@@ -44,6 +44,29 @@ function blend(items, goal) {
   return weights;
 }
 const key='terpedia.rx.v1';
+let parentId = null;
+function startFork(rx) {
+  parentId = rx.id;
+  $('draftHeading').textContent = 'Fork of ' + rx.name;
+  $('titleInput').value = rx.name + ' (variation)';
+  $('mass').value = rx.batchGrams;
+  names.forEach((name, index) => {
+    targets[index].value = rx.profile.find(p => p.name === name)?.target ?? 0;
+  });
+  const available = rx.availableIngredientIds ?? rx.ingredients.map(i => i.id);
+  catalog.forEach((item, index) => { enabled[index].checked = available.includes(item.id); });
+  $('cancelFork').hidden = false;
+  $('titleInput').focus();
+}
+function clearFork() {
+  parentId = null;
+  $('form').reset();
+  targets.forEach((input, i) => { input.value = names[i] === 'Linalool' ? 8 : 0; });
+  enabled.forEach(input => { input.checked = true; });
+  $('draftHeading').textContent = 'Create an Rx';
+  $('cancelFork').hidden = true;
+}
+$('cancelFork').onclick = clearFork;
 function render(){
   const recipes=JSON.parse(localStorage.getItem(key)||'[]');
   $('library').replaceChildren();
@@ -58,7 +81,26 @@ function render(){
     link.textContent='Download Rx JSON';
     link.download=rx.id+'.json';
     link.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(rx,null,2));
-    panel.append(title,body,link);
+    panel.id = 'rx-' + rx.id;
+    panel.append(title);
+    if (rx.parentId) {
+      const parent = recipes.find(item => item.id === rx.parentId);
+      const lineage = document.createElement('p');
+      lineage.textContent = 'Forked from ';
+      const source = document.createElement('a');
+      source.textContent = parent?.name ?? rx.parentId;
+      if (parent) {
+        source.href = '#rx-' + parent.id;
+        source.onclick = () => { document.getElementById('rx-' + parent.id).open = true; };
+      }
+      lineage.append(source);
+      panel.append(lineage);
+    }
+    const fork = document.createElement('button');
+    fork.type = 'button';
+    fork.textContent = 'Fork recipe';
+    fork.onclick = () => startFork(rx);
+    panel.append(body, fork, ' ', link);
     $('library').append(panel);
   }
 }
@@ -73,9 +115,10 @@ $('form').onsubmit=e=>{
   }
   const weights=blend(items,goal);
   const batchGrams=Number($('mass').value);
-  const rx={schemaVersion:1,id:crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],estimated:items.reduce((s,item,i)=>s+weights[i]*(item.profile[name]||0),0)}))};
+  const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],estimated:items.reduce((s,item,i)=>s+weights[i]*(item.profile[name]||0),0)}))};
   try {
     localStorage.setItem(key,JSON.stringify([rx,...JSON.parse(localStorage.getItem(key)||'[]')]));
+    if (parentId) clearFork();
     render();
     $('library').firstElementChild.open=true;
     $('message').textContent='Rx saved. Compare your targets with the estimated blend below.';
