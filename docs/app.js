@@ -71,7 +71,7 @@ function makeTarget(name) {
   Object.assign(input, {type:'number', min:0, max:100, step:'any'});
   input.setAttribute('aria-label', name + ' mass percent');
   row.insertCell().append(input);
-  row.insertCell().append(removeButton(() => { input.value = ''; row.hidden = true; }));
+  row.insertCell().append(removeButton(() => { input.value = ''; row.hidden = true; refreshDraft(true); }));
   row.hidden = true;
   $('targets').append(row);
   return input;
@@ -100,7 +100,7 @@ const enabled = catalog.map(item => {
   label.append(amount);
   label.hidden = true;
   row.append(label);
-  row.append(removeButton(() => { amount.value = 0; row.hidden = true; row.open = false; }));
+  row.append(removeButton(() => { amount.value = 0; row.hidden = true; row.open = false; refreshDraft(true); }));
   $('stock').append(row);
   return row;
 });
@@ -134,6 +134,7 @@ function addTarget() {
   if (percent.value !== '') target.value = percent.value;
   field.value = '';
   percent.value = '';
+  refreshDraft(true);
   target.focus();
   return true;
 }
@@ -143,7 +144,7 @@ $('newPercent').onkeydown = $('targetSearch').onkeydown = event => {
 };
 attachPicker('ingredientSearch','ingredientOptions','addIngredient',catalog.map(i =>
   i.name + (i.inchikey ? ' · ' + i.inchikey + ' · ' + Object.values(i.profile)[0] + '%' : '')
-), i => { enabled[i].hidden = false; enabled[i].open = true; });
+), i => { enabled[i].hidden = false; enabled[i].open = true; refreshDraft(true); });
 // Pairwise coordinate descent on the simplex. Transfer mass between ingredients
 // using the exact least-squares line minimum along each feasible direction.
 function blend(items, goal) {
@@ -197,6 +198,7 @@ function startFork(rx, edit = false) {
     amounts[index].parentElement.hidden = !edit;
     amounts[index].value = rx.ingredients.find(line => line.id === item.id)?.grams ?? 0; });
   $('cancelFork').hidden = false;
+  refreshDraft(!edit);
   $('titleInput').focus();
 }
 function clearFork() {
@@ -327,6 +329,13 @@ function render(){
 $('form').onsubmit=e=>{
   e.preventDefault();
   if (($('targetSearch').value.trim() || $('newPercent').value) && !addTarget()) return;
+  updateRecipe({save:true, refit:!editing});
+};
+function refreshDraft(refit) {
+  updateRecipe({save:false, refit:refit || !editing});
+}
+function updateRecipe({save, refit}) {
+  $('preview').replaceChildren();
   const goal=targets.map(t=>Number(t.value));
   const sum=goal.reduce((a,b)=>a+b,0);
   const items=catalog.filter((_,i)=>!enabled[i].hidden);
@@ -334,12 +343,20 @@ $('form').onsubmit=e=>{
     $('message').textContent='Choose an ingredient and enter targets totaling more than 0% and at most 100%.';
     return;
   }
-  const batchGrams=Number($('mass').value);
-  const fitting = e.submitter === $('fit');
+  let batchGrams=Number($('mass').value);
+  if (!Number.isFinite(batchGrams) || batchGrams <= 0 || targets.some(t => !t.validity.valid)) {
+    $('message').textContent = 'Enter a positive batch mass and valid target percentages.';
+    return;
+  }
   const selectedAmounts = amounts.filter((_,i) => !enabled[i].hidden);
   let weights;
-  if (editing && !fitting) {
+  if (!refit) {
     const total = selectedAmounts.reduce((sum,input) => sum + Number(input.value), 0);
+    if (selectedAmounts.some(input => !input.validity.valid) || total <= 0) {
+      $('message').textContent = 'Enter ingredient amounts totaling more than zero.';
+      return;
+    }
+    if (!save) batchGrams = total;
     if (Math.abs(total - batchGrams) > batchGrams * 1e-8) {
       $('message').textContent = 'Ingredient amounts total ' + total + ' g. Adjust them to the batch mass or update ingredients to meet targets.';
       return;
@@ -349,12 +366,14 @@ $('form').onsubmit=e=>{
     weights = blend(items, goal);
   }
   const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:editing?.id ?? crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],sourceMissing:goal[k]>0 && !items.some(item=>fraction(item,name)>0),estimated:items.reduce((s,item,i)=>s+weights[i]*fraction(item, name),0)}))};
-  if (fitting) {
-    selectedAmounts.forEach((input,i) => { input.value = weights[i] * batchGrams; });
+  if (!save) {
+    if (refit) selectedAmounts.forEach((input,i) => { input.value = weights[i] * batchGrams; });
     const preview = recipeCard(rx, false);
     preview.querySelector('.padHeader span').textContent = 'Unsaved estimate';
     $('preview').replaceChildren(preview);
-    $('message').textContent = 'Ingredient amounts updated. Review the estimated profile before saving.';
+    $('message').textContent = Math.abs(batchGrams - Number($('mass').value)) > batchGrams * 1e-8
+      ? 'Preview uses the actual ingredient total of ' + batchGrams + ' g. Match the batch mass before saving.'
+      : '';
     return;
   }
   try {
@@ -366,7 +385,10 @@ $('form').onsubmit=e=>{
     $('featuredRx').scrollIntoView({block:'start'});
     $('message').textContent='Rx saved.';
   } catch { $('message').textContent='Browser storage is unavailable. The recipe could not be saved.'; }
-};
+}
 render();
-
-$('form').addEventListener('input', () => $('preview').replaceChildren());
+$('fit').onclick = () => refreshDraft(true);
+$('form').addEventListener('input', event => {
+  if (targets.includes(event.target) || event.target === $('mass')) refreshDraft(true);
+  if (amounts.includes(event.target) || event.target === $('titleInput')) refreshDraft(false);
+});
