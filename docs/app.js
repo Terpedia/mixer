@@ -1,5 +1,36 @@
 const $ = id => document.getElementById(id);
 const catalog = await fetch('./catalog.json').then(r => r.json());
+const leads = await fetch('./isolates.json').then(r => r.json());
+const customKey = 'terpedia.isolates.v1';
+const personal = JSON.parse(localStorage.getItem(customKey) || '[]');
+catalog.push(...personal);
+const picker = $('isolatePicker');
+for (const [index, lead] of leads.entries()) {
+  picker.add(new Option(lead.name + ' · ' + lead.inchikey, index));
+}
+function showListings() {
+  const lead = leads[Number(picker.value)];
+  const list = $('supplierList');
+  list.replaceChildren(...lead.listings.map(([id, vendor, code]) =>
+    new Option(vendor + ' · ' + code + ' · ' + id, JSON.stringify([id, vendor, code]))
+  ));
+}
+picker.onchange = showListings;
+showListings();
+$('addIsolate').onsubmit = event => {
+  event.preventDefault();
+  const lead = leads[Number(picker.value)];
+  const [terokitId, vendor, code] = JSON.parse($('supplierList').value);
+  const purity = Number($('assay').value);
+  const id = JSON.stringify([lead.inchikey, vendor, code, purity]);
+  if (!personal.some(item => item.id === id)) {
+    personal.push({id, name: lead.name + ' isolate (' + vendor + ', ' + code + ')',
+      type:'isolate', profile:{[lead.name]:purity}, inchikey:lead.inchikey,
+      terokitId, vendor, code, profileBasis:'User-entered mass assay'});
+    localStorage.setItem(customKey, JSON.stringify(personal));
+  }
+  location.reload();
+};
 const names = [...new Set(catalog.flatMap(i => Object.keys(i.profile)))];
 function control(parent, text, type) {
   const label = document.createElement('label');
