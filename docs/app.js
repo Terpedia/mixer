@@ -88,10 +88,19 @@ function ensureTarget(name) {
 function fraction(item, name) {
   return Object.hasOwn(item.profile, name) ? item.profile[name] : 0;
 }
+const amounts = [];
 const enabled = catalog.map(item => {
   const row = ingredientRow(item);
   row.hidden = true;
-  row.append(removeButton(() => { row.hidden = true; row.open = false; }));
+  const label = document.createElement('label');
+  label.textContent = 'Ingredient mass (g) ';
+  const amount = document.createElement('input');
+  Object.assign(amount, {type:'number', min:0, step:'any', value:0});
+  amounts.push(amount);
+  label.append(amount);
+  label.hidden = true;
+  row.append(label);
+  row.append(removeButton(() => { amount.value = 0; row.hidden = true; row.open = false; }));
   $('stock').append(row);
   return row;
 });
@@ -160,10 +169,20 @@ function blend(items, goal) {
 }
 const key='terpedia.rx.v1';
 let parentId = null;
-function startFork(rx) {
-  parentId = rx.id;
+let editing = null;
+function startFork(rx, edit = false) {
+  clearFork();
+  editing = edit ? rx : null;
+  parentId = edit ? rx.parentId ?? null : rx.id;
   $('draftHeading').textContent = 'Fork of ' + rx.name;
   $('titleInput').value = rx.name + ' (variation)';
+  if (edit) {
+    $('draftHeading').textContent = 'Edit Rx';
+    $('titleInput').value = rx.name;
+    $('cancelFork').textContent = 'Cancel edit';
+    $('fit').hidden = false;
+    $('saveRx').textContent = 'Save ingredient amounts';
+  }
   $('mass').value = rx.batchGrams;
   rx.profile.filter(p => p.target > 0).forEach(p => ensureTarget(p.name));
   names.forEach((name, index) => {
@@ -172,12 +191,22 @@ function startFork(rx) {
     targets[index].closest('tr').hidden = !target;
   });
   const available = rx.availableIngredientIds ?? rx.ingredients.map(i => i.id);
-  catalog.forEach((item, index) => { enabled[index].hidden = !available.includes(item.id); });
+  catalog.forEach((item, index) => { const selected = available.includes(item.id);
+    enabled[index].hidden = !selected;
+    enabled[index].open = edit && selected;
+    amounts[index].parentElement.hidden = !edit;
+    amounts[index].value = rx.ingredients.find(line => line.id === item.id)?.grams ?? 0; });
   $('cancelFork').hidden = false;
   $('titleInput').focus();
 }
 function clearFork() {
+  editing = null;
   parentId = null;
+  $('fit').hidden = true;
+  $('preview').replaceChildren();
+  $('saveRx').textContent = 'Calculate and save Rx';
+  $('cancelFork').textContent = 'Cancel fork';
+  amounts.forEach(input => { input.parentElement.hidden = true; });
   $('form').reset();
   targets.forEach(input => { input.value = ''; input.closest('tr').hidden = true; });
   enabled.forEach(row => { row.hidden = true; row.open = false; });
@@ -185,7 +214,7 @@ function clearFork() {
   $('cancelFork').hidden = true;
 }
 $('cancelFork').onclick = clearFork;
-function recipeCard(rx) {
+function recipeCard(rx, editable = true) {
   const card = document.createElement('article');
   card.className = 'rxCard';
   card.setAttribute('aria-label', 'Rx card for ' + rx.name);
@@ -239,6 +268,13 @@ function recipeCard(rx) {
     line.append(citation);
     list.append(line);
   }
+  if (editable) {
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.textContent = 'Edit Rx';
+    edit.onclick = () => startFork(rx, true);
+    card.querySelector('.padHeader').append(edit);
+  }
   return card;
 }
 function render(){
@@ -246,7 +282,7 @@ function render(){
   const example = {
     name: '10% myrcene', batchGrams: 10,
     ingredients: [
-      {inchikey:'UAHWPYUMFXYFJY-UHFFFAOYSA-N', name:'Myrcene isolate', type:'Example isolate', profile:{Myrcene:95}, grams:1/0.95},
+      {id:'example-myrcene', inchikey:'UAHWPYUMFXYFJY-UHFFFAOYSA-N', name:'Myrcene isolate', type:'Example isolate', profile:{Myrcene:95}, grams:1/0.95},
       {id:'neutral', name:'Neutral carrier', type:'Carrier', profile:{}, grams:10-1/0.95}
     ],
     profile:[{name:'Myrcene', target:10, estimated:10}]
@@ -298,12 +334,33 @@ $('form').onsubmit=e=>{
     $('message').textContent='Choose an ingredient and enter targets totaling more than 0% and at most 100%.';
     return;
   }
-  const weights=blend(items,goal);
   const batchGrams=Number($('mass').value);
-  const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],sourceMissing:goal[k]>0 && !items.some(item=>fraction(item,name)>0),estimated:items.reduce((s,item,i)=>s+weights[i]*fraction(item, name),0)}))};
+  const fitting = e.submitter === $('fit');
+  const selectedAmounts = amounts.filter((_,i) => !enabled[i].hidden);
+  let weights;
+  if (editing && !fitting) {
+    const total = selectedAmounts.reduce((sum,input) => sum + Number(input.value), 0);
+    if (Math.abs(total - batchGrams) > batchGrams * 1e-8) {
+      $('message').textContent = 'Ingredient amounts total ' + total + ' g. Adjust them to the batch mass or update ingredients to meet targets.';
+      return;
+    }
+    weights = selectedAmounts.map(input => Number(input.value) / batchGrams);
+  } else {
+    weights = blend(items, goal);
+  }
+  const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:editing?.id ?? crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],sourceMissing:goal[k]>0 && !items.some(item=>fraction(item,name)>0),estimated:items.reduce((s,item,i)=>s+weights[i]*fraction(item, name),0)}))};
+  if (fitting) {
+    selectedAmounts.forEach((input,i) => { input.value = weights[i] * batchGrams; });
+    const preview = recipeCard(rx, false);
+    preview.querySelector('.padHeader span').textContent = 'Unsaved estimate';
+    $('preview').replaceChildren(preview);
+    $('message').textContent = 'Ingredient amounts updated. Review the estimated profile before saving.';
+    return;
+  }
   try {
-    localStorage.setItem(key,JSON.stringify([rx,...JSON.parse(localStorage.getItem(key)||'[]')]));
-    if (parentId) clearFork();
+    const others = JSON.parse(localStorage.getItem(key)||'[]').filter(record => record.id !== rx.id);
+    localStorage.setItem(key,JSON.stringify([rx,...others]));
+    if (editing || parentId) clearFork();
     render();
     $('library').firstElementChild.open=true;
     $('featuredRx').scrollIntoView({block:'start'});
@@ -311,3 +368,5 @@ $('form').onsubmit=e=>{
   } catch { $('message').textContent='Browser storage is unavailable. The recipe could not be saved.'; }
 };
 render();
+
+$('form').addEventListener('input', () => $('preview').replaceChildren());

@@ -1,4 +1,5 @@
 [
+ {"id":"example-myrcene","inchikey":"UAHWPYUMFXYFJY-UHFFFAOYSA-N","name":"Myrcene isolate (example)","type":"example isolate","profile":{"Myrcene":95}},
  {"id":"lim-isolate","name":"Limonene isolate","type":"isolate","profile":{"Limonene":99}},
  {"id":"lavender","name":"Lavender oil","type":"essential oil","profile":{"Linalool":32,"Linalyl acetate":38}},
  {"id":"hop-extract","name":"Hop extract","type":"extract","profile":{"Myrcene":12,"Humulene":5}},
