@@ -188,7 +188,7 @@ function recipeCard(rx) {
     <h4>Recipe</h4><div class="padIngredients"></div>
     <table><caption>Estimated terpene profile</caption>
     <thead><tr><th scope="col">Terpene</th><th scope="col">Target %</th><th scope="col">Estimated %</th></tr></thead>
-    <tbody></tbody></table><footer>Percentages by mass · Calculated from ingredient profiles</footer>`;
+    <tbody></tbody></table><h4>Supportable claims</h4><ul class="rxClaims"></ul><footer>Percentages by mass · Calculated from ingredient profiles</footer>`;
   card.querySelector('h3').textContent = rx.name;
   card.querySelector('small').textContent = rx.batchGrams + ' g batch';
   for (const item of rx.ingredients) {
@@ -209,6 +209,28 @@ function recipeCard(rx) {
       note.textContent = 'No recorded source';
       estimate.append(note);
     }
+  }
+  const list = card.querySelector('.rxClaims');
+  const present = rx.profile.filter(entry => entry.estimated > 0);
+  for (const entry of present) {
+    const line = document.createElement('li');
+    const grams = Number((rx.batchGrams * entry.estimated / 100).toPrecision(4));
+    line.textContent = 'The ingredient profiles predict ' + grams + ' g of ' + entry.name + ' in this batch.';
+    list.append(line);
+  }
+  if (!present.length) {
+    const line = document.createElement('li');
+    line.textContent = 'The selected ingredient profiles support no positive terpene estimate.';
+    list.append(line);
+  }
+  if (present.some(entry => ['myrcene', 'β-myrcene', 'beta-myrcene'].includes(entry.name.toLowerCase()))) {
+    const line = document.createElement('li');
+    line.append('Ingredient research: isolated myrcene elicited TRPV1-dependent currents in engineered cells. The study tested isolated myrcene; effects of this recipe remain untested. ');
+    const citation = document.createElement('a');
+    citation.href = 'https://pubmed.ncbi.nlm.nih.gov/31446830/';
+    citation.textContent = 'Read the study (2019)';
+    line.append(citation);
+    list.append(line);
   }
   return card;
 }
