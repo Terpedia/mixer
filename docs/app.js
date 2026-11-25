@@ -54,7 +54,7 @@ function removeButton(action) {
   button.onclick = action;
   return button;
 }
-const targets = names.map(name => {
+function makeTarget(name) {
   const row = document.createElement('div');
   const label = document.createElement('label');
   const input = document.createElement('input');
@@ -64,7 +64,19 @@ const targets = names.map(name => {
   row.hidden = true;
   $('targets').append(row);
   return input;
-});
+}
+const targets = names.map(makeTarget);
+const suggestions = [...new Set([...names, ...leads.map(lead => lead.name)])].sort();
+function ensureTarget(name) {
+  const index = names.findIndex(existing => existing.toLowerCase() === name.toLowerCase());
+  if (index >= 0) return index;
+  names.push(name);
+  targets.push(makeTarget(name));
+  return names.length - 1;
+}
+function fraction(item, name) {
+  return Object.hasOwn(item.profile, name) ? item.profile[name] : 0;
+}
 const enabled = catalog.map(item => {
   const row = ingredientRow(item);
   row.hidden = true;
@@ -89,17 +101,28 @@ function attachPicker(field, list, button, labels, select) {
   input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
   $(button).onclick = add;
 }
-attachPicker('targetSearch','terpeneOptions','addTarget',names,i => {
-  targets[i].closest('div').hidden = false;
-  targets[i].focus();
-});
+$('terpeneOptions').replaceChildren(...suggestions.map(name => new Option(name)));
+function addTarget() {
+  const field = $('targetSearch');
+  const text = field.value.trim();
+  if (!text) { field.focus(); return; }
+  const canonical = suggestions.find(name => name.toLowerCase() === text.toLowerCase()) ?? text;
+  const target = targets[ensureTarget(canonical)];
+  target.closest('div').hidden = false;
+  field.value = '';
+  target.focus();
+}
+$('addTarget').onclick = addTarget;
+$('targetSearch').onkeydown = event => {
+  if (event.key === 'Enter') { event.preventDefault(); addTarget(); }
+};
 attachPicker('ingredientSearch','ingredientOptions','addIngredient',catalog.map(i =>
   i.name + (i.inchikey ? ' · ' + i.inchikey + ' · ' + Object.values(i.profile)[0] + '%' : '')
 ), i => { enabled[i].hidden = false; enabled[i].open = true; });
 // Pairwise coordinate descent on the simplex. Transfer mass between ingredients
 // using the exact least-squares line minimum along each feasible direction.
 function blend(items, goal) {
-  const vectors = items.map(i => names.map(n => i.profile[n] || 0));
+  const vectors = items.map(i => names.map(n => fraction(i, n)));
   const weights = items.map((_,i) => Number(i === 0));
   const residual = vectors[0].map((v,k) => v-goal[k]);
   for(let sweep=0;sweep<2000;sweep++){
@@ -126,6 +149,7 @@ function startFork(rx) {
   $('draftHeading').textContent = 'Fork of ' + rx.name;
   $('titleInput').value = rx.name + ' (variation)';
   $('mass').value = rx.batchGrams;
+  rx.profile.filter(p => p.target > 0).forEach(p => ensureTarget(p.name));
   names.forEach((name, index) => {
     const target = rx.profile.find(p => p.name === name)?.target;
     targets[index].value = target || '';
@@ -155,7 +179,7 @@ function render(){
     title.textContent=rx.name+' · '+rx.batchGrams+' g';
     const body=document.createElement('pre');
     const rows = rx.ingredients.map(item => ingredientRow(item, item.grams.toFixed(4) + ' g'));
-    body.textContent='Target → estimated mass %\n'+rx.profile.map(p=>p.name+'   '+p.target+' → '+p.estimated.toFixed(3)).join('\n');
+    body.textContent='Target → estimated mass %\n'+rx.profile.map(p=>p.name+'   '+p.target+' → '+p.estimated.toFixed(3)+(p.sourceMissing ? ' · No recorded source among selected ingredients' : '')).join('\n');
     const link=document.createElement('a');
     link.textContent='Download Rx JSON';
     link.download=rx.id+'.json';
@@ -194,7 +218,7 @@ $('form').onsubmit=e=>{
   }
   const weights=blend(items,goal);
   const batchGrams=Number($('mass').value);
-  const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],estimated:items.reduce((s,item,i)=>s+weights[i]*(item.profile[name]||0),0)}))};
+  const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],sourceMissing:goal[k]>0 && !items.some(item=>fraction(item,name)>0),estimated:items.reduce((s,item,i)=>s+weights[i]*fraction(item, name),0)}))};
   try {
     localStorage.setItem(key,JSON.stringify([rx,...JSON.parse(localStorage.getItem(key)||'[]')]));
     if (parentId) clearFork();
