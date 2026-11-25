@@ -5,7 +5,7 @@
 <a href="./">Terpedia Mixer</a><main><h1 id="name">Ingredient</h1><p id="identity"></p><h2>Supplier listings</h2><p id="status"></p><ul id="suppliers"></ul></main>
 <script type="module">
 const id = new URLSearchParams(location.search).get('id');
-const [catalog, isolates] = await Promise.all(['catalog','isolates'].map(async file => (await fetch('./'+file+'.json')).json()));
+const [catalog, isolates, suppliers] = await Promise.all(['catalog','isolates','suppliers'].map(async file => (await fetch('./'+file+'.json')).json()));
 const material = catalog.find(item => item.id === id);
 const isolate = isolates.find(item => item.inchikey === id);
 const heading = document.querySelector('h1');
@@ -13,16 +13,13 @@ heading.textContent = material?.name ?? (isolate ? isolate.name + ' isolate' : '
 document.title = heading.textContent + ' · Terpedia';
 const profile = Object.entries(material?.profile ?? {}).map(([name,pct]) => name+' '+pct+'%');
 document.querySelector('#identity').textContent = isolate ? 'InChIKey · '+isolate.inchikey : [material?.type, profile.length ? 'Illustrative profile · '+profile.join(', ') : ''].filter(Boolean).join(' · ');
-document.querySelector('#status').textContent = isolate ? 'Historical Terokit listings. Confirm the catalog code, availability and assay with the supplier.' : 'No supplier listings are linked to this material.';
-for (const [terokitId, vendor, code, website] of isolate?.listings ?? []) {
+document.querySelector('#status').textContent = isolate ? 'Historical supplier listings. Confirm the catalog code, availability and assay with the supplier.' : 'No supplier listings are linked to this material.';
+for (const {supplierId, code} of isolate?.listings ?? []) {
   const row = document.createElement('li');
-  if (/^https?:\/\//i.test(website)) {
-    const link = document.createElement('a');
-    link.href = website;
-    link.textContent = vendor;
-    row.append(link);
-  } else row.append(vendor);
-  row.append(' · '+code+' · '+terokitId);
+  const link = document.createElement('a');
+  link.href = './supplier.html?id=' + encodeURIComponent(supplierId);
+  link.textContent = suppliers.find(s => s.id === supplierId).name;
+  row.append(link, ' · ' + code);
   document.querySelector('#suppliers').append(row);
 }
 </script></html>

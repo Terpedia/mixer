@@ -1,6 +1,7 @@
 const $ = id => document.getElementById(id);
 const catalog = await fetch('./catalog.json').then(r => r.json());
 const leads = await fetch('./isolates.json').then(r => r.json());
+const suppliers = new Map((await fetch('./suppliers.json').then(r => r.json())).map(s => [s.id, s]));
 const customKey = 'terpedia.isolates.v1';
 const personal = JSON.parse(localStorage.getItem(customKey) || '[]');
 catalog.push(...personal);
@@ -11,8 +12,8 @@ for (const [index, lead] of leads.entries()) {
 function showListings() {
   const lead = leads[Number(picker.value)];
   const list = $('supplierList');
-  list.replaceChildren(...lead.listings.map(([id, vendor, code]) =>
-    new Option(vendor + ' · ' + code + ' · ' + id, JSON.stringify([id, vendor, code]))
+  list.replaceChildren(...lead.listings.map(({supplierId, code}) =>
+    new Option(suppliers.get(supplierId).name + ' · ' + code, JSON.stringify({supplierId, code}))
   ));
 }
 picker.onchange = showListings;
@@ -20,13 +21,14 @@ showListings();
 $('addIsolate').onsubmit = event => {
   event.preventDefault();
   const lead = leads[Number(picker.value)];
-  const [terokitId, vendor, code] = JSON.parse($('supplierList').value);
+  const {supplierId, code} = JSON.parse($('supplierList').value);
+  const vendor = suppliers.get(supplierId).name;
   const purity = Number($('assay').value);
   const id = JSON.stringify([lead.inchikey, vendor, code, purity]);
   if (!personal.some(item => item.id === id)) {
     personal.push({id, name: lead.name + ' isolate (' + vendor + ', ' + code + ')',
       type:'isolate', profile:{[lead.name]:purity}, inchikey:lead.inchikey,
-      terokitId, vendor, code, profileBasis:'User-entered mass assay'});
+      supplierId, vendor, code, profileBasis:'User-entered mass assay'});
     localStorage.setItem(customKey, JSON.stringify(personal));
   }
   location.reload();

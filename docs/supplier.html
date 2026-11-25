@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suppliers · Terpedia</title>
+<style>body{max-width:48rem;margin:3rem auto;padding:0 1rem;font:1.05rem/1.6 system-ui;background:#fffcf3;color:#213f36}h1,h2{font-family:Georgia,serif}a{color:#245747}li{margin:.4em 0}</style>
+<nav><a href="./">Terpedia Mixer</a> / <a href="supplier.html">Suppliers</a></nav>
+<main><h1>Suppliers</h1><div id="sites"></div><h2 id="subtitle" hidden>Listed ingredients</h2><ul></ul></main>
+<script type="module">
+const suppliers = await fetch('./suppliers.json').then(r => r.json());
+const id = new URLSearchParams(location.search).get('id');
+function link(label, href) {
+  const a = document.createElement('a');
+  a.href = href;
+  a.textContent = label;
+  return a;
+}
+function addRow(anchor, suffix = '') {
+  const li = document.createElement('li');
+  li.append(anchor, suffix);
+  document.querySelector('ul').append(li);
+}
+if (id === null) {
+  for (const s of suppliers) addRow(link(s.name, '?id=' + s.id));
+} else {
+  const supplier = suppliers.find(s => s.id === id);
+  document.querySelector('h1').textContent = supplier?.name ?? 'Unknown supplier';
+  if (supplier) {
+    document.title = supplier.name + ' · Terpedia';
+    for (const url of supplier.websites) {
+      const p = document.createElement('p');
+      p.append(link(new URL(url).hostname, url));
+      document.querySelector('#sites').append(p);
+    }
+    document.querySelector('#subtitle').hidden = false;
+    const isolates = await fetch('./isolates.json').then(r => r.json());
+    for (const item of isolates) {
+      for (const offer of item.listings.filter(o => o.supplierId === id)) {
+        addRow(link(item.name, './ingredient.html?id=' + item.inchikey), ' · ' + offer.code);
+      }
+    }
+  }
+}
+</script></html>
