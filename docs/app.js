@@ -32,25 +32,70 @@ $('addIsolate').onsubmit = event => {
   location.reload();
 };
 const names = [...new Set(catalog.flatMap(i => Object.keys(i.profile)))];
-function control(parent, text, type) {
-  const label = document.createElement('label');
-  const input = document.createElement('input');
-  input.type = type;
-  label.append(input, ' ' + text);
-  $(parent).append(label);
-  return input;
+function ingredientRow(item, amount) {
+  const row = document.createElement('details');
+  row.className = 'ingredient';
+  const summary = document.createElement('summary');
+  const columns = document.createElement('span');
+  const detail = document.createElement('small');
+  detail.textContent = amount ?? item.type;
+  columns.append(item.name, detail);
+  summary.append(columns);
+  const profile = document.createElement('p');
+  const components = Object.entries(item.profile).map(([name, value]) => name + ' ' + value + '%');
+  profile.textContent = [item.type, components.join(', ') || 'No tracked terpenes', item.vendor, item.code].filter(Boolean).join(' · ');
+  row.append(summary, profile);
+  return row;
+}
+function removeButton(action) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = 'Remove';
+  button.onclick = action;
+  return button;
 }
 const targets = names.map(name => {
-  const input = control('targets', name + ' (%)', 'number');
-  Object.assign(input, {min:0, max:100, step:'any', value:name === 'Linalool' ? 8 : 0});
+  const row = document.createElement('div');
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+  Object.assign(input, {type:'number', min:0, max:100, step:'any'});
+  label.append(name + ' (%) ', input);
+  row.append(label, removeButton(() => { input.value = ''; row.hidden = true; }));
+  row.hidden = true;
+  $('targets').append(row);
   return input;
 });
-const enabled = catalog.map(i => {
-  const composition = Object.entries(i.profile).map(([n,p]) => n+' '+p+'%').join(', ');
-  const input = control('stock', i.name+' · '+i.type+' · '+(composition || 'no tracked terpenes'), 'checkbox');
-  input.checked = true;
-  return input;
+const enabled = catalog.map(item => {
+  const row = ingredientRow(item);
+  row.hidden = true;
+  row.append(removeButton(() => { row.hidden = true; row.open = false; }));
+  $('stock').append(row);
+  return row;
 });
+function attachPicker(field, list, button, labels, select) {
+  const input = $(field);
+  $(list).replaceChildren(...labels.map(label => new Option(label)));
+  function add() {
+    const index = labels.findIndex(label => label.toLowerCase() === input.value.trim().toLowerCase());
+    if (index < 0) {
+      input.setCustomValidity('Choose a listed item.');
+      input.reportValidity();
+      return;
+    }
+    select(index);
+    input.value = '';
+  }
+  input.oninput = () => input.setCustomValidity('');
+  input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
+  $(button).onclick = add;
+}
+attachPicker('targetSearch','terpeneOptions','addTarget',names,i => {
+  targets[i].closest('div').hidden = false;
+  targets[i].focus();
+});
+attachPicker('ingredientSearch','ingredientOptions','addIngredient',catalog.map(i =>
+  i.name + (i.inchikey ? ' · ' + i.inchikey + ' · ' + Object.values(i.profile)[0] + '%' : '')
+), i => { enabled[i].hidden = false; enabled[i].open = true; });
 // Pairwise coordinate descent on the simplex. Transfer mass between ingredients
 // using the exact least-squares line minimum along each feasible direction.
 function blend(items, goal) {
@@ -82,18 +127,20 @@ function startFork(rx) {
   $('titleInput').value = rx.name + ' (variation)';
   $('mass').value = rx.batchGrams;
   names.forEach((name, index) => {
-    targets[index].value = rx.profile.find(p => p.name === name)?.target ?? 0;
+    const target = rx.profile.find(p => p.name === name)?.target;
+    targets[index].value = target || '';
+    targets[index].closest('div').hidden = !target;
   });
   const available = rx.availableIngredientIds ?? rx.ingredients.map(i => i.id);
-  catalog.forEach((item, index) => { enabled[index].checked = available.includes(item.id); });
+  catalog.forEach((item, index) => { enabled[index].hidden = !available.includes(item.id); });
   $('cancelFork').hidden = false;
   $('titleInput').focus();
 }
 function clearFork() {
   parentId = null;
   $('form').reset();
-  targets.forEach((input, i) => { input.value = names[i] === 'Linalool' ? 8 : 0; });
-  enabled.forEach(input => { input.checked = true; });
+  targets.forEach(input => { input.value = ''; input.closest('div').hidden = true; });
+  enabled.forEach(row => { row.hidden = true; row.open = false; });
   $('draftHeading').textContent = 'Create an Rx';
   $('cancelFork').hidden = true;
 }
@@ -107,7 +154,8 @@ function render(){
     const title=document.createElement('summary');
     title.textContent=rx.name+' · '+rx.batchGrams+' g';
     const body=document.createElement('pre');
-    body.textContent=rx.ingredients.map(i=>i.name+' · '+i.grams.toFixed(4)+' g').join('\n')+'\n\nTarget → estimated mass %\n'+rx.profile.map(p=>p.name+'   '+p.target+' → '+p.estimated.toFixed(3)).join('\n');
+    const rows = rx.ingredients.map(item => ingredientRow(item, item.grams.toFixed(4) + ' g'));
+    body.textContent='Target → estimated mass %\n'+rx.profile.map(p=>p.name+'   '+p.target+' → '+p.estimated.toFixed(3)).join('\n');
     const link=document.createElement('a');
     link.textContent='Download Rx JSON';
     link.download=rx.id+'.json';
@@ -131,7 +179,7 @@ function render(){
     fork.type = 'button';
     fork.textContent = 'Fork recipe';
     fork.onclick = () => startFork(rx);
-    panel.append(body, fork, ' ', link);
+    panel.append(...rows, body, fork, ' ', link);
     $('library').append(panel);
   }
 }
@@ -139,7 +187,7 @@ $('form').onsubmit=e=>{
   e.preventDefault();
   const goal=targets.map(t=>Number(t.value));
   const sum=goal.reduce((a,b)=>a+b,0);
-  const items=catalog.filter((_,i)=>enabled[i].checked);
+  const items=catalog.filter((_,i)=>!enabled[i].hidden);
   if(!items.length || sum<=0 || sum>100){
     $('message').textContent='Choose an ingredient and enter targets totaling more than 0% and at most 100%.';
     return;
