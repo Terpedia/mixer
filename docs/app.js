@@ -178,6 +178,40 @@ function clearFork() {
   $('cancelFork').hidden = true;
 }
 $('cancelFork').onclick = clearFork;
+function recipeCard(rx) {
+  const card = document.createElement('article');
+  card.className = 'rxCard';
+  card.setAttribute('aria-label', 'Rx card for ' + rx.name);
+  card.innerHTML = `
+    <div class="padHeader"><strong>Terpedia</strong><span>Formulation record</span></div>
+    <div class="padTitle"><span aria-hidden="true">℞</span><div><h3></h3><small></small></div></div>
+    <h4>Recipe</h4><div class="padIngredients"></div>
+    <table><caption>Estimated terpene profile</caption>
+    <thead><tr><th scope="col">Terpene</th><th scope="col">Target %</th><th scope="col">Estimated %</th></tr></thead>
+    <tbody></tbody></table><footer>Percentages by mass · Calculated from ingredient profiles</footer>`;
+  card.querySelector('h3').textContent = rx.name;
+  card.querySelector('small').textContent = rx.batchGrams + ' g batch';
+  for (const item of rx.ingredients) {
+    card.querySelector('.padIngredients').append(ingredientRow(item, item.grams.toFixed(4) + ' g'));
+  }
+  const body = card.querySelector('tbody');
+  for (const entry of rx.profile.filter(p => p.target > 0 || p.estimated > 0)) {
+    const row = body.insertRow();
+    const name = document.createElement('th');
+    name.scope = 'row';
+    name.textContent = entry.name;
+    row.append(name);
+    row.insertCell().textContent = entry.target;
+    const estimate = row.insertCell();
+    estimate.textContent = entry.estimated.toFixed(3);
+    if (entry.sourceMissing) {
+      const note = document.createElement('small');
+      note.textContent = 'No recorded source';
+      estimate.append(note);
+    }
+  }
+  return card;
+}
 function render(){
   const recipes=JSON.parse(localStorage.getItem(key)||'[]');
   $('library').replaceChildren();
@@ -186,9 +220,7 @@ function render(){
     const panel=document.createElement('details');
     const title=document.createElement('summary');
     title.textContent=rx.name+' · '+rx.batchGrams+' g';
-    const body=document.createElement('pre');
-    const rows = rx.ingredients.map(item => ingredientRow(item, item.grams.toFixed(4) + ' g'));
-    body.textContent='Target → estimated mass %\n'+rx.profile.map(p=>p.name+'   '+p.target+' → '+p.estimated.toFixed(3)+(p.sourceMissing ? ' · No recorded source among selected ingredients' : '')).join('\n');
+    const card = recipeCard(rx);
     const link=document.createElement('a');
     link.textContent='Download Rx JSON';
     link.download=rx.id+'.json';
@@ -212,7 +244,7 @@ function render(){
     fork.type = 'button';
     fork.textContent = 'Fork recipe';
     fork.onclick = () => startFork(rx);
-    panel.append(...rows, body, fork, ' ', link);
+    panel.append(card, fork, ' ', link);
     $('library').append(panel);
   }
 }
