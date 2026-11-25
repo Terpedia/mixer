@@ -29,3 +29,7 @@
 .padHeader .cardIcon { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; }
 .padHeader .cardIcon:focus-visible { outline: 3px solid #34594a; outline-offset: 3px; }
 .padHeader span { margin-right: auto; }
+
+.rxCard input[form=form] { max-width:100%; box-sizing:border-box; color:inherit; background:transparent; border:0; border-bottom:1px solid #81958b; border-radius:0; }
+.rxCard h3 input { font:inherit; width:100%; }
+.rxCard input[type=number][form=form] { width:6em; }

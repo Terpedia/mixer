@@ -131,7 +131,7 @@ function addTarget() {
   if (!percent.reportValidity()) return false;
   const canonical = suggestions.find(name => name.toLowerCase() === text.toLowerCase()) ?? text;
   const target = targets[ensureTarget(canonical)];
-  target.closest('tr').hidden = false;
+  $('targets').rows[targets.indexOf(target)].hidden = false;
   if (percent.value !== '') target.value = percent.value;
   field.value = '';
   percent.value = '';
@@ -172,6 +172,7 @@ function blend(items, goal) {
 const key='terpedia.rx.v1';
 let parentId = null;
 let editing = null;
+let inline = null;
 function startFork(rx, edit = false) {
   clearFork();
   openEditor();
@@ -204,6 +205,11 @@ function startFork(rx, edit = false) {
   $('titleInput').focus();
 }
 function clearFork() {
+  if (inline) {
+    for (const [node, marker] of inline.moved) marker.replaceWith(node);
+    inline.card.replaceWith(inline.original);
+    inline = null;
+  }
   $('featuredRx').hidden = false;
   $('form').hidden = true;
   $('message').textContent = '';
@@ -237,6 +243,95 @@ function cardIcon(button, label, path) {
   button.title = label;
   button.setAttribute('aria-label', label);
   button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + path + '"/></svg>';
+}
+function editInPlace(original, rx) {
+  startFork(rx, true);
+  const card = recipeCard(rx, false);
+  original.replaceWith(card);
+  inline = {card, original, moved:[], rows:new Map(), lines:new Map()};
+  $('featuredRx').hidden = false;
+  $('form').hidden = true;
+  function move(node, destination, label) {
+    const marker = document.createComment('editor control');
+    node.before(marker);
+    inline.moved.push([node, marker]);
+    node.setAttribute('aria-label', label);
+    node.setAttribute('form', 'form');
+    destination.append(node);
+  }
+  const heading = card.querySelector('h3');
+  heading.replaceChildren();
+  move($('titleInput'), heading, 'Recipe name');
+  const batch = card.querySelector('.padTitle small');
+  batch.replaceChildren();
+  move($('mass'), batch, 'Batch mass in grams');
+  batch.append(' g batch');
+  const toolbar = card.querySelector('.padHeader');
+  for (const [label, path, action] of [
+    ['Save Rx','M4 12l5 5L20 6',() => $('form').requestSubmit($('saveRx'))],
+    ['Cancel edit','M5 5l14 14M19 5L5 19',clearFork]
+  ]) {
+    const button = document.createElement('button');
+    cardIcon(button,label,path);
+    button.onclick = action;
+    toolbar.append(button);
+  }
+  const ingredients = card.querySelector('.padIngredients');
+  ingredients.replaceChildren();
+  function picker(container, field, button, label) {
+    const line = document.createElement('div');
+    container.append(line);
+    move($(field), line, label);
+    if (field === 'targetSearch') move($('newPercent'), line, 'New target percent');
+    move($(button), line, label);
+  }
+  picker(ingredients.parentElement.insertBefore(document.createElement('div'), ingredients.nextSibling),'ingredientSearch','addIngredient','Add ingredient');
+  const table = card.querySelector('table');
+  table.querySelector('tbody').replaceChildren();
+  picker(table.parentElement.insertBefore(document.createElement('div'),table.nextSibling),'targetSearch','addTarget','Add target');
+  function sync(result) {
+    catalog.forEach((item,i) => {
+      let line = inline.lines.get(i);
+      if (!line && !enabled[i].hidden) {
+        line = ingredientRow(item);
+        const cell = line.querySelector('summary small');
+        cell.replaceChildren();
+        move(amounts[i],cell,item.name + ' grams');
+        cell.append(' g');
+        line.append(removeButton(() => { enabled[i].hidden = true; refreshDraft(true); }));
+        ingredients.append(line);
+        inline.lines.set(i,line);
+      }
+      if (line) line.hidden = enabled[i].hidden;
+    });
+    names.forEach((name,i) => {
+      let row = inline.rows.get(i);
+      const originalRow = $('targets').rows[i];
+      const estimate = result?.profile[i]?.estimated;
+      if (!row && (!originalRow.hidden || estimate > 0)) {
+        row = table.tBodies[0].insertRow();
+        row.insertCell().textContent = name;
+        move(targets[i], row.insertCell(), name + ' target percent');
+        row.insertCell();
+        inline.rows.set(i,row);
+      }
+      if (row) {
+        row.hidden = originalRow.hidden && !(estimate > 0);
+        row.cells[2].textContent = estimate == null ? '—' : estimate.toFixed(3);
+      }
+    });
+    const claims = card.querySelector('.rxClaims');
+    claims.replaceChildren();
+    if (result) claims.append(...recipeCard(result,false).querySelector('.rxClaims').childNodes);
+  }
+  inline.sync = sync;
+  card.addEventListener('input', e => {
+    if (targets.includes(e.target)) $('targets').rows[targets.indexOf(e.target)].hidden = false;
+    if (targets.includes(e.target) || e.target === $('mass')) refreshDraft(true);
+    if (amounts.includes(e.target) || e.target === $('titleInput')) refreshDraft(false);
+  });
+  refreshDraft(false);
+  $('titleInput').focus();
 }
 function recipeCard(rx, editable = true) {
   const card = document.createElement('article');
@@ -306,7 +401,7 @@ function recipeCard(rx, editable = true) {
     const edit = document.createElement('button');
     edit.type = 'button';
     cardIcon(edit, 'Edit Rx', 'M4 20l4.5-1 12-12-3.5-3.5-12 12L4 20z M14.5 6l3.5 3.5');
-    edit.onclick = () => startFork(rx, true);
+    edit.onclick = () => editInPlace(card, rx);
     card.querySelector('.padHeader').append(edit);
   }
   return card;
@@ -379,6 +474,7 @@ function refreshDraft(refit) {
   updateRecipe({save:false, refit:refit || !editing});
 }
 function updateRecipe({save, refit}) {
+  inline?.sync(null);
   $('preview').replaceChildren();
   const goal=targets.map(t=>Number(t.value));
   const sum=goal.reduce((a,b)=>a+b,0);
@@ -412,6 +508,7 @@ function updateRecipe({save, refit}) {
   const rx={schemaVersion:2,parentId,availableIngredientIds:items.map(item=>item.id),id:editing?.id ?? crypto.randomUUID(),name:$('titleInput').value,batchGrams,profileBasis:'illustrative mass percentages',ingredients:items.map((item,i)=>({...item,grams:weights[i]*batchGrams})).filter(i=>i.grams>0),profile:names.map((name,k)=>({name,target:goal[k],sourceMissing:goal[k]>0 && !items.some(item=>fraction(item,name)>0),estimated:items.reduce((s,item,i)=>s+weights[i]*fraction(item, name),0)}))};
   if (!save) {
     if (refit) selectedAmounts.forEach((input,i) => { input.value = weights[i] * batchGrams; });
+    if (inline) inline.sync(rx);
     const preview = recipeCard(rx, false);
     $('preview').replaceChildren(...preview.querySelectorAll('table, h4:last-of-type, .rxClaims, footer'));
     if (!editing) $('preview').prepend(preview.querySelector('.padIngredients'));
