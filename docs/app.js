@@ -214,6 +214,17 @@ function recipeCard(rx) {
 }
 function render(){
   const recipes=JSON.parse(localStorage.getItem(key)||'[]');
+  const example = {
+    name: '10% myrcene', batchGrams: 10,
+    ingredients: [
+      {name:'Myrcene isolate', type:'Example isolate', profile:{Myrcene:95}, grams:1/0.95},
+      {name:'Neutral carrier', type:'Carrier', profile:{}, grams:10-1/0.95}
+    ],
+    profile:[{name:'Myrcene', target:10, estimated:10}]
+  };
+  const featured = recipeCard(recipes[0] ?? example);
+  featured.querySelector('.padHeader span').textContent = recipes.length ? 'Latest saved Rx card' : 'Example Rx card';
+  $('featuredRx').replaceChildren(featured);
   $('library').replaceChildren();
   if(!recipes.length) $('library').textContent='Your first recipe will appear here.';
   for(const rx of recipes){
@@ -266,7 +277,8 @@ $('form').onsubmit=e=>{
     if (parentId) clearFork();
     render();
     $('library').firstElementChild.open=true;
-    $('message').textContent='Rx saved. Compare your targets with the estimated blend below.';
+    $('featuredRx').scrollIntoView({block:'start'});
+    $('message').textContent='Rx saved.';
   } catch { $('message').textContent='Browser storage is unavailable. The recipe could not be saved.'; }
 };
 render();
