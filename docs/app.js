@@ -2,6 +2,7 @@ const $ = id => document.getElementById(id);
 const catalog = await fetch('./catalog.json').then(r => r.json());
 const leads = await fetch('./isolates.json').then(r => r.json());
 const suppliers = new Map((await fetch('./suppliers.json').then(r => r.json())).map(s => [s.id, s]));
+const hypotheses = await fetch('./hypotheses.json').then(r => r.json());
 const customKey = 'terpedia.isolates.v1';
 const personal = JSON.parse(localStorage.getItem(customKey) || '[]');
 catalog.push(...personal);
@@ -226,7 +227,7 @@ function recipeCard(rx, editable = true) {
     <h4>Recipe</h4><div class="padIngredients"></div>
     <table><caption>Estimated terpene profile</caption>
     <thead><tr><th scope="col">Terpene</th><th scope="col">Target %</th><th scope="col">Estimated %</th></tr></thead>
-    <tbody></tbody></table><h4>Supportable claims</h4><ul class="rxClaims"></ul><footer>Percentages by mass · Calculated from ingredient profiles</footer>`;
+    <tbody></tbody></table><h4>Hypotheses &amp; evidence</h4><ul class="rxClaims"></ul><footer>Percentages by mass · Calculated from ingredient profiles</footer>`;
   card.querySelector('h3').textContent = rx.name;
   card.querySelector('small').textContent = rx.batchGrams + ' g batch';
   for (const item of rx.ingredients) {
@@ -249,27 +250,37 @@ function recipeCard(rx, editable = true) {
     }
   }
   const list = card.querySelector('.rxClaims');
-  const present = rx.profile.filter(entry => entry.estimated > 0);
-  for (const entry of present) {
+  const compounds = new Set(rx.profile.filter(p => p.estimated > 0).map(p => {
+    const name = p.name.trim().toLowerCase();
+    return ['myrcene', 'beta-myrcene'].includes(name) ? 'β-myrcene' : name;
+  }));
+  const matched = hypotheses.filter(h => compounds.has(h.compound.toLowerCase()));
+  for (const level of ['Animal study', 'Cell study', 'Proposed']) {
+    const group = matched.filter(h => h.level === level);
+    if (!group.length) continue;
     const line = document.createElement('li');
-    const grams = Number((rx.batchGrams * entry.estimated / 100).toPrecision(4));
-    line.textContent = 'The ingredient profiles predict ' + grams + ' g of ' + entry.name + ' in this batch.';
+    const section = document.createElement('details');
+    section.open = level !== 'Proposed';
+    const title = document.createElement('summary');
+    title.textContent = level + ' · ' + group.length;
+    section.append(title);
+    for (const h of group) {
+      const p = document.createElement('p');
+      const heading = document.createElement('strong');
+      heading.textContent = h.compound + ' · ' + h.effect;
+      p.append(heading, document.createElement('br'), h.basis);
+      if (h.pmid) {
+        const source = document.createElement('a');
+        source.href = 'https://pubmed.ncbi.nlm.nih.gov/' + h.pmid + '/';
+        source.textContent = 'Primary study';
+        p.append(' ', source);
+      }
+      section.append(p);
+    }
+    line.append(section);
     list.append(line);
   }
-  if (!present.length) {
-    const line = document.createElement('li');
-    line.textContent = 'The selected ingredient profiles support no positive terpene estimate.';
-    list.append(line);
-  }
-  if (present.some(entry => ['myrcene', 'β-myrcene', 'beta-myrcene'].includes(entry.name.toLowerCase()))) {
-    const line = document.createElement('li');
-    line.append('Ingredient research: isolated myrcene elicited TRPV1-dependent currents in engineered cells. The study tested isolated myrcene; effects of this recipe remain untested. ');
-    const citation = document.createElement('a');
-    citation.href = 'https://pubmed.ncbi.nlm.nih.gov/31446830/';
-    citation.textContent = 'Read the study (2019)';
-    line.append(citation);
-    list.append(line);
-  }
+  if (!matched.length) list.textContent = 'No reviewed or proposed hypotheses are linked to this profile yet.';
   if (editable) {
     const edit = document.createElement('button');
     edit.type = 'button';

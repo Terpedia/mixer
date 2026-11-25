@@ -1,0 +1,774 @@
+[
+  {
+    "id": "H0001",
+    "compound": "α-pinene",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0002",
+    "compound": "humulene",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0003",
+    "compound": "β-caryophyllene",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0004",
+    "compound": "β-myrcene",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0005",
+    "compound": "linalool",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0006",
+    "compound": "phytol",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0007",
+    "compound": "borneol",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0008",
+    "compound": "α-bisabolol",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0009",
+    "compound": "ocimene",
+    "effect": "anti-inflammatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0010",
+    "compound": "d-limonene",
+    "effect": "absorption",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0011",
+    "compound": "humulene",
+    "effect": "alcohol craving reduction",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0012",
+    "compound": "d-limonene",
+    "effect": "alertness",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0013",
+    "compound": "α-pinene",
+    "effect": "analgesic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0014",
+    "compound": "humulene",
+    "effect": "analgesic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0015",
+    "compound": "β-caryophyllene",
+    "effect": "analgesic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0016",
+    "compound": "β-myrcene",
+    "effect": "Reduced pain sensitivity",
+    "level": "Animal study",
+    "basis": "Myrcene reduced experimentally induced pain responses in rats and mice. Human pain relief and the effect of this blend remain open questions.",
+    "pmid": "1753786"
+  },
+  {
+    "id": "H0017",
+    "compound": "linalool",
+    "effect": "analgesic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0018",
+    "compound": "borneol",
+    "effect": "analgesic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0019",
+    "compound": "humulene",
+    "effect": "anorectic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0020",
+    "compound": "β-caryophyllene",
+    "effect": "anti-anxiety",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0021",
+    "compound": "linalool",
+    "effect": "anti-anxiety",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0022",
+    "compound": "borneol",
+    "effect": "anti-anxiety",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0023",
+    "compound": "d-limonene",
+    "effect": "anti-anxiety",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0024",
+    "compound": "α-pinene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0025",
+    "compound": "β-pinene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0026",
+    "compound": "humulene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0027",
+    "compound": "β-caryophyllene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0028",
+    "compound": "β-myrcene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0029",
+    "compound": "terpinolene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0030",
+    "compound": "fenchol",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0031",
+    "compound": "α-bisabolol",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0032",
+    "compound": "ocimene",
+    "effect": "anti-bacterial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0033",
+    "compound": "β-caryophyllene",
+    "effect": "anti-coagulant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0034",
+    "compound": "linalool",
+    "effect": "anti-coagulant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0035",
+    "compound": "borneol",
+    "effect": "anti-coagulant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0036",
+    "compound": "β-pinene",
+    "effect": "anti-depressant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0037",
+    "compound": "β-caryophyllene",
+    "effect": "anti-depressant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0038",
+    "compound": "linalool",
+    "effect": "anti-depressant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0039",
+    "compound": "d-limonene",
+    "effect": "anti-depressant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0040",
+    "compound": "linalool",
+    "effect": "anti-epileptic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0041",
+    "compound": "β-caryophyllene",
+    "effect": "anti-fungal",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0042",
+    "compound": "caryophyllene oxide",
+    "effect": "anti-fungal",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0043",
+    "compound": "terpinolene",
+    "effect": "anti-fungal",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0044",
+    "compound": "ocimene",
+    "effect": "anti-fungal",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0045",
+    "compound": "α-pinene",
+    "effect": "anti-microbial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0046",
+    "compound": "β-pinene",
+    "effect": "anti-microbial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0047",
+    "compound": "nerolidol",
+    "effect": "anti-microbial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0048",
+    "compound": "terpinolene",
+    "effect": "anti-microbial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0049",
+    "compound": "α-bisabolol",
+    "effect": "anti-microbial",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0050",
+    "compound": "β-myrcene",
+    "effect": "anti-mutagenic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0051",
+    "compound": "phytol",
+    "effect": "anti-nociceptive",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0052",
+    "compound": "borneol",
+    "effect": "anti-nociceptive",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0053",
+    "compound": "β-pinene",
+    "effect": "anti-oxidant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0054",
+    "compound": "β-caryophyllene",
+    "effect": "anti-oxidant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0055",
+    "compound": "terpinolene",
+    "effect": "anti-oxidant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0056",
+    "compound": "phytol",
+    "effect": "anti-oxidant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0057",
+    "compound": "borneol",
+    "effect": "anti-oxidant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0058",
+    "compound": "nerolidol",
+    "effect": "anti-parastitic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0059",
+    "compound": "β-pinene",
+    "effect": "anti-proliferative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0060",
+    "compound": "humulene",
+    "effect": "anti-proliferative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0061",
+    "compound": "β-myrcene",
+    "effect": "anti-proliferative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0062",
+    "compound": "terpinolene",
+    "effect": "anti-proliferative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0063",
+    "compound": "β-myrcene",
+    "effect": "anti-psychotic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0064",
+    "compound": "β-caryophyllene",
+    "effect": "anti-septic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0065",
+    "compound": "ocimene",
+    "effect": "anti-septic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0066",
+    "compound": "β-myrcene",
+    "effect": "anti-spasmodic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0067",
+    "compound": "phytol",
+    "effect": "anti-toxin",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0068",
+    "compound": "α-pinene",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0069",
+    "compound": "β-pinene",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0070",
+    "compound": "caryophyllene oxide",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0071",
+    "compound": "terpinolene",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0072",
+    "compound": "phytol",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0073",
+    "compound": "terpineol",
+    "effect": "anti-tumor",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0074",
+    "compound": "α-pinene",
+    "effect": "anti-viral",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0075",
+    "compound": "β-pinene",
+    "effect": "anti-viral",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0076",
+    "compound": "ocimene",
+    "effect": "anti-viral",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0077",
+    "compound": "β-caryophyllene",
+    "effect": "brain ischemia",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0078",
+    "compound": "α-pinene",
+    "effect": "bronchodialator",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0079",
+    "compound": "phytol",
+    "effect": "cardiovascular health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0080",
+    "compound": "terpineol",
+    "effect": "cardiovascular health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0081",
+    "compound": "ocimene",
+    "effect": "decongestant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0082",
+    "compound": "β-caryophyllene",
+    "effect": "gastric protection",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0083",
+    "compound": "α-bisabolol",
+    "effect": "hyper-pigmentation",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0084",
+    "compound": "α-pinene",
+    "effect": "immuno-stimulatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0085",
+    "compound": "phytol",
+    "effect": "immuno-stimulatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0086",
+    "compound": "terpineol",
+    "effect": "immuno-stimulatory",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0087",
+    "compound": "humulene",
+    "effect": "interleukin-B secretion",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0088",
+    "compound": "β-caryophyllene",
+    "effect": "longevity",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0089",
+    "compound": "borneol",
+    "effect": "lowers blood-brain barrier",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0090",
+    "compound": "α-pinene",
+    "effect": "memory retention",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0091",
+    "compound": "β-pinene",
+    "effect": "memory retention",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0092",
+    "compound": "α-bisabolol",
+    "effect": "natural humectant",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0093",
+    "compound": "β-caryophyllene",
+    "effect": "neuro-inflammation",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0094",
+    "compound": "borneol",
+    "effect": "neurological health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0095",
+    "compound": "terpineol",
+    "effect": "neurological health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0096",
+    "compound": "β-caryophyllene",
+    "effect": "neuroprotective",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0097",
+    "compound": "borneol",
+    "effect": "neuroprotective",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0098",
+    "compound": "terpineol",
+    "effect": "neuroprotective",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0099",
+    "compound": "α-pinene",
+    "effect": "oral health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0100",
+    "compound": "humulene",
+    "effect": "pharmacokinetic",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0101",
+    "compound": "phytol",
+    "effect": "prohibits neurotransmitter degeneration",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0102",
+    "compound": "phytol",
+    "effect": "relaxation",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0103",
+    "compound": "α-pinene",
+    "effect": "respiratory function",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0104",
+    "compound": "α-pinene",
+    "effect": "sedative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0105",
+    "compound": "β-myrcene",
+    "effect": "sedative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0106",
+    "compound": "linalool",
+    "effect": "sedative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0107",
+    "compound": "terpinolene",
+    "effect": "sedative",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0108",
+    "compound": "α-pinene",
+    "effect": "skin health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "H0109",
+    "compound": "α-bisabolol",
+    "effect": "skin health",
+    "level": "Proposed",
+    "basis": "Listed in the Terpedia hypothesis register. Direct evidence for this endpoint is pending review."
+  },
+  {
+    "id": "B004-myrcene",
+    "compound": "β-myrcene",
+    "effect": "TRPV1 activation",
+    "level": "Cell study",
+    "basis": "Myrcene activated TRPV1 in engineered cells. Whether this blend produces a comparable response is unknown.",
+    "pmid": "31446830"
+  }
+]
