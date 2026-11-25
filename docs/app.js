@@ -55,12 +55,16 @@ function removeButton(action) {
   return button;
 }
 function makeTarget(name) {
-  const row = document.createElement('div');
-  const label = document.createElement('label');
+  const row = document.createElement('tr');
+  const label = document.createElement('th');
+  label.scope = 'row';
+  label.textContent = name;
+  row.append(label);
   const input = document.createElement('input');
   Object.assign(input, {type:'number', min:0, max:100, step:'any'});
-  label.append(name + ' (%) ', input);
-  row.append(label, removeButton(() => { input.value = ''; row.hidden = true; }));
+  input.setAttribute('aria-label', name + ' mass percent');
+  row.insertCell().append(input);
+  row.insertCell().append(removeButton(() => { input.value = ''; row.hidden = true; }));
   row.hidden = true;
   $('targets').append(row);
   return input;
@@ -105,15 +109,20 @@ $('terpeneOptions').replaceChildren(...suggestions.map(name => new Option(name))
 function addTarget() {
   const field = $('targetSearch');
   const text = field.value.trim();
-  if (!text) { field.focus(); return; }
+  if (!text) { field.focus(); return false; }
+  const percent = $('newPercent');
+  if (!percent.reportValidity()) return false;
   const canonical = suggestions.find(name => name.toLowerCase() === text.toLowerCase()) ?? text;
   const target = targets[ensureTarget(canonical)];
-  target.closest('div').hidden = false;
+  target.closest('tr').hidden = false;
+  if (percent.value !== '') target.value = percent.value;
   field.value = '';
+  percent.value = '';
   target.focus();
+  return true;
 }
 $('addTarget').onclick = addTarget;
-$('targetSearch').onkeydown = event => {
+$('newPercent').onkeydown = $('targetSearch').onkeydown = event => {
   if (event.key === 'Enter') { event.preventDefault(); addTarget(); }
 };
 attachPicker('ingredientSearch','ingredientOptions','addIngredient',catalog.map(i =>
@@ -153,7 +162,7 @@ function startFork(rx) {
   names.forEach((name, index) => {
     const target = rx.profile.find(p => p.name === name)?.target;
     targets[index].value = target || '';
-    targets[index].closest('div').hidden = !target;
+    targets[index].closest('tr').hidden = !target;
   });
   const available = rx.availableIngredientIds ?? rx.ingredients.map(i => i.id);
   catalog.forEach((item, index) => { enabled[index].hidden = !available.includes(item.id); });
@@ -163,7 +172,7 @@ function startFork(rx) {
 function clearFork() {
   parentId = null;
   $('form').reset();
-  targets.forEach(input => { input.value = ''; input.closest('div').hidden = true; });
+  targets.forEach(input => { input.value = ''; input.closest('tr').hidden = true; });
   enabled.forEach(row => { row.hidden = true; row.open = false; });
   $('draftHeading').textContent = 'Create an Rx';
   $('cancelFork').hidden = true;
@@ -209,6 +218,7 @@ function render(){
 }
 $('form').onsubmit=e=>{
   e.preventDefault();
+  if (($('targetSearch').value.trim() || $('newPercent').value) && !addTarget()) return;
   const goal=targets.map(t=>Number(t.value));
   const sum=goal.reduce((a,b)=>a+b,0);
   const items=catalog.filter((_,i)=>!enabled[i].hidden);
