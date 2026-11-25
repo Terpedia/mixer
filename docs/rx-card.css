@@ -23,3 +23,5 @@
 .rxCard th[scope=row] { font-weight: normal; }
 .rxCard td small { display: block; }
 .rxCard footer { margin-top: 1rem; color: #4f6357; }
+#form.rxCard > section, #form.rxCard > details { background: transparent; padding: .7rem 0; border: 0; border-bottom: 1px solid #c8cec1; border-radius: 0; }
+.padHeader { flex-wrap: wrap; }

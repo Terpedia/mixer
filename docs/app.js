@@ -174,6 +174,7 @@ let parentId = null;
 let editing = null;
 function startFork(rx, edit = false) {
   clearFork();
+  openEditor();
   editing = edit ? rx : null;
   parentId = edit ? rx.parentId ?? null : rx.id;
   $('draftHeading').textContent = 'Fork of ' + rx.name;
@@ -203,6 +204,9 @@ function startFork(rx, edit = false) {
   $('titleInput').focus();
 }
 function clearFork() {
+  $('featuredRx').hidden = false;
+  $('form').hidden = true;
+  $('message').textContent = '';
   editing = null;
   parentId = null;
   $('fit').hidden = true;
@@ -213,8 +217,19 @@ function clearFork() {
   $('form').reset();
   targets.forEach(input => { input.value = ''; input.closest('tr').hidden = true; });
   enabled.forEach(row => { row.hidden = true; row.open = false; });
-  $('draftHeading').textContent = 'Create an Rx';
+  $('draftHeading').textContent = 'New Rx';
   $('cancelFork').hidden = true;
+}
+function openEditor() {
+  $('featuredRx').hidden = true;
+  $('form').hidden = false;
+  $('cancelFork').hidden = false;
+}
+function newRecipe() {
+  clearFork();
+  openEditor();
+  $('cancelFork').textContent = 'Cancel';
+  $('titleInput').focus();
 }
 $('cancelFork').onclick = clearFork;
 function recipeCard(rx, editable = true) {
@@ -302,6 +317,11 @@ function render(){
   };
   const featured = recipeCard(recipes[0] ?? example);
   featured.querySelector('.padHeader span').textContent = recipes.length ? 'Latest saved Rx card' : 'Example Rx card';
+  const create = document.createElement('button');
+  create.type = 'button';
+  create.textContent = 'New Rx';
+  create.onclick = newRecipe;
+  featured.querySelector('.padHeader').append(create);
   $('featuredRx').replaceChildren(featured);
   $('library').replaceChildren();
   if(!recipes.length) $('library').textContent='Your first recipe will appear here.';
@@ -309,7 +329,14 @@ function render(){
     const panel=document.createElement('details');
     const title=document.createElement('summary');
     title.textContent=rx.name+' · '+rx.batchGrams+' g';
-    const card = recipeCard(rx);
+    const card = removeButton(() => {
+      clearFork();
+      const selected = recipeCard(rx);
+      selected.querySelector('.padHeader').append(create);
+      $('featuredRx').replaceChildren(selected);
+      $('featuredRx').scrollIntoView({block:'start'});
+    });
+    card.textContent = 'View Rx';
     const link=document.createElement('a');
     link.textContent='Download Rx JSON';
     link.download=rx.id+'.json';
@@ -380,8 +407,8 @@ function updateRecipe({save, refit}) {
   if (!save) {
     if (refit) selectedAmounts.forEach((input,i) => { input.value = weights[i] * batchGrams; });
     const preview = recipeCard(rx, false);
-    preview.querySelector('.padHeader span').textContent = 'Unsaved estimate';
-    $('preview').replaceChildren(preview);
+    $('preview').replaceChildren(...preview.querySelectorAll('table, h4:last-of-type, .rxClaims, footer'));
+    if (!editing) $('preview').prepend(preview.querySelector('.padIngredients'));
     $('message').textContent = Math.abs(batchGrams - Number($('mass').value)) > batchGrams * 1e-8
       ? 'Preview uses the actual ingredient total of ' + batchGrams + ' g. Match the batch mass before saving.'
       : '';
@@ -390,9 +417,9 @@ function updateRecipe({save, refit}) {
   try {
     const others = JSON.parse(localStorage.getItem(key)||'[]').filter(record => record.id !== rx.id);
     localStorage.setItem(key,JSON.stringify([rx,...others]));
-    if (editing || parentId) clearFork();
+    clearFork();
     render();
-    $('library').firstElementChild.open=true;
+
     $('featuredRx').scrollIntoView({block:'start'});
     $('message').textContent='Rx saved.';
   } catch { $('message').textContent='Browser storage is unavailable. The recipe could not be saved.'; }
