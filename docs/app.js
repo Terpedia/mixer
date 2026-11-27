@@ -1,3 +1,4 @@
+import {linkFor, readLink} from './rx-link.js';
 const $ = id => document.getElementById(id);
 const catalog = await fetch('./catalog.json').then(r => r.json());
 const leads = await fetch('./isolates.json').then(r => r.json());
@@ -6,6 +7,17 @@ const hypotheses = await fetch('./hypotheses.json').then(r => r.json());
 const customKey = 'terpedia.isolates.v1';
 const personal = JSON.parse(localStorage.getItem(customKey) || '[]');
 catalog.push(...personal);
+let shared = null;
+let linkError = false;
+const route = new URL(location.href);
+if (route.searchParams.has('rx')) {
+  try {
+    shared = readLink(route.searchParams.get('rx'));
+    for (const item of shared.ingredients) {
+      if (!catalog.some(existing => existing.id === item.id)) catalog.push(item);
+    }
+  } catch { linkError = true; }
+}
 const picker = $('isolatePicker');
 for (const [index, lead] of leads.entries()) {
   picker.add(new Option(lead.name + ' · ' + lead.inchikey, index));
@@ -402,7 +414,17 @@ function recipeCard(rx, editable = true) {
     edit.type = 'button';
     cardIcon(edit, 'Edit Rx', 'M4 20l4.5-1 12-12-3.5-3.5-12 12L4 20z M14.5 6l3.5 3.5');
     edit.onclick = () => editInPlace(card, rx);
-    card.querySelector('.padHeader').append(edit);
+    const share = document.createElement('button');
+    share.type = 'button';
+    cardIcon(share, 'Copy Rx link', 'M10 13a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-2 2 M14 11a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l2-2');
+    share.onclick = async () => {
+      const url = linkFor(rx);
+      try {
+        await navigator.clipboard.writeText(url);
+        $('message').textContent = 'Rx link copied.';
+      } catch { window.prompt('Copy Rx link', url); }
+    };
+    card.querySelector('.padHeader').append(edit, share);
   }
   return card;
 }
@@ -416,8 +438,8 @@ function render(){
     ],
     profile:[{name:'Myrcene', target:10, estimated:10}]
   };
-  const featured = recipeCard(recipes[0] ?? example);
-  featured.querySelector('.padHeader span').textContent = recipes.length ? 'Latest saved Rx card' : 'Example Rx card';
+  const featured = recipeCard(shared ?? recipes[0] ?? example);
+  featured.querySelector('.padHeader span').textContent = shared ? 'Shared Rx card' : recipes.length ? 'Latest saved Rx card' : 'Example Rx card';
   const create = document.createElement('button');
   create.type = 'button';
   cardIcon(create, 'New Rx', 'M12 4v16 M4 12h16');
@@ -520,6 +542,11 @@ function updateRecipe({save, refit}) {
   try {
     const others = JSON.parse(localStorage.getItem(key)||'[]').filter(record => record.id !== rx.id);
     localStorage.setItem(key,JSON.stringify([rx,...others]));
+    shared = null;
+    if (route.searchParams.has('rx')) {
+      route.searchParams.delete('rx');
+      history.replaceState(null, '', route);
+    }
     clearFork();
     render();
 
@@ -528,6 +555,7 @@ function updateRecipe({save, refit}) {
   } catch { $('message').textContent='Browser storage is unavailable. The recipe could not be saved.'; }
 }
 render();
+if (linkError) $('message').textContent = 'This Rx link could not be opened.';
 $('fit').onclick = () => refreshDraft(true);
 $('form').addEventListener('input', event => {
   if (targets.includes(event.target) || event.target === $('mass')) refreshDraft(true);
